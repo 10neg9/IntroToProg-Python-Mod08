@@ -1,4 +1,2 @@
-Boat,2333.44
-Car,123444.44
-Skiis,123.44
-Car,34.56
+Golf Club,34.88
+Tennis Racket,28.99

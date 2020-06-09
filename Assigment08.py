@@ -9,6 +9,7 @@
 # NSmith,6/7/2020,Updated code in class FileProcessor
 # NSmith,6/7/2020,Updated code in class IO
 # NSmith,6/7/2020,Added Main body code
+# NSmith,6/8/2020,Added try-except to Main - Add a Product
 # ------------------------------------------------------------------------ #
 
 # Data -------------------------------------------------------------------- #
@@ -33,6 +34,8 @@ class Product:
         NSmith,6/7/2020,Added Constructor
         NSmith,6/7/2020,Added product_name property
         NSmith,6/7/2020,Added product_price property
+        NSmith,6/8/2020,Removed try-except statements--\
+        will handle errors in IO
     """
 
     # -- Constructor --
@@ -59,16 +62,12 @@ class Product:
 
     @product_name.setter
     def product_name(self, value: str):  # define setter of property product_name
-        """ Sets product name if it is is not numeric;\
-        ;otherwise, raises exception.
+        """ Sets product name
 
         :param value: (string) the name of product to set:
         :return: nothing
         """
-        if not str(value).isnumeric():  # check if string only has alphabet chars
-            self.__product_name = value  # assign value to hidden attribute
-        else:
-            raise Exception("Names cannot be numbers.")  # raise exception if number in name
+        self.__product_name = value  # assign value to hidden attribute
 
     # Product Price
     @property
@@ -81,16 +80,12 @@ class Product:
 
     @product_price.setter
     def product_price(self, value: float):  # define setter of property product_price
-        """ Sets product price if it is a number;\
-        ;otherwise, prints ValueError exception message.
+        """ Sets product price
 
         :param value: (string) product price in float format:
         :return: nothing
         """
-        try:  # check if value can convert to float, needed if file does not have float
-            self.__product_price = float(value)  # assign float(value) to hidden attribute
-        except Exception:  # exception if error
-            print('An error occurred...be careful inputting prices.')
+        self.__product_price = float(value)  # assign float(value) to hidden attribute
 
 
 # Data -------------------------------------------------------------------- #
@@ -108,6 +103,7 @@ class FileProcessor:
         RRoot,1.1.2030,Created Class
         NSmith,6/7/2020,Added read_data_from_file static method
         NSmith,6/7/2020,Added save_data_to_file static method
+        NSmith,6/8/2020,Added try-except to read_data_from_file
     """
 
     # Code to process data from a file into a list
@@ -119,12 +115,17 @@ class FileProcessor:
         :return: (list) of product names and prices
         """
         lst = []  # create empty list object
-        f = open(file_name, "r")  # open file in read mode
-        for line in f:  # iterate through each line in file
-            prod, price = line.split(",")  # split line with comma separator
-            prodObj = Product(prod, price)  # create object from Product class
-            lst.append(prodObj)  # store object to list
-        f.close()  # close the file
+        try:  # check if file can be opened first i.e. does it exist?
+            f = open(file_name, "r")  # open file in read mode
+        except Exception:
+            print("Catalog file does not exist.")
+            print("Starting with empty product list.")
+        else:  # run this code if try succeeds
+            for line in f:  # iterate through each line in file
+                prod, price = line.split(",")  # split line with comma separator
+                prodObj = Product(prod, price)  # create object from Product class
+                lst.append(prodObj)  # store object to list
+            f.close()  # close the file
         return lst  # return a list of objects
 
     # Code to process list data to a file
@@ -160,6 +161,7 @@ class IO:
         NSmith,6/7/2020,Added print_current_product_list static method
         NSmith,6/7/2020,Added input_product_and_price static method
         NSmith,6/7/2020,Added input_press_to_continue static method
+        Nsmith,6/8/2020,Added try-except to input_product_and_price
     """
 
     # Static Method to show menu to user
@@ -220,22 +222,24 @@ class IO:
         """
         # get product name from user
         str_prod = str(input("Enter a product name: ").strip())
-        if str_prod.isalpha(): pass  # check if input is valid i.e. alphabetic characters only
-        else:
-            raise Exception("Names cannot be numbers. Let's start over.")  # raise exception if number in name
-        # get price from user
-        str_price = str(input("Enter the price: ").strip())
+        # check if input is valid product name
         try:
-            flt_price = float(str_price)
-        except Exception:
-            print("Prices must be numbers. Let's start over.")
-        # if str_price.isnumeric():  # check if input is valid i.e. only numbers
-        #     flt_price = float(str_price)
-        # else:
-        #     raise Exception("Prices must be numbers. Let's start over.")  # raise exception if number in name
-        else:
-            print()  # Add an extra line for looks
-            return str_prod, flt_price  # return the product name and its price
+            if not(not str_prod.isnumeric() and "." not in str_prod):
+                # raise exception if number in name
+                raise Exception("You did not enter a valid product name.\n")
+        except Exception as e:
+            print(e)
+        else:  # if user entered valid product name, now ask for price
+            str_price = str(input("Enter the price: ").strip())
+            try:
+                #  try to convert string to float
+                flt_price = float(str_price)
+            except Exception:
+                print("Prices must be numbers.\n")
+            # Execute the else statement if try successful
+            else:
+                print()  # Add an extra line for looks
+                return str_prod, flt_price  # return the product name and its price
 
     @staticmethod
     def input_press_to_continue(optional_message=''):
@@ -271,9 +275,9 @@ while True:
         # Let user add data to the list of product objects
         try:  # try to run code, basically check if inputs are valid
             productName, productPrice = IO.input_product_and_price()  # unpack tuple
-        # if try fails and IO does not handle the exception, run this exception
+        # if try fails run this exception
         except Exception:
-            print("Value not entered correctly. Let's start over.")
+            print("Product not added, let's try again.")
         else:  # if try succeeds run this code
             productObject = Product(productName, productPrice)  # create object instance
             lstOfProductObjects.append(productObject)  # append object to list
