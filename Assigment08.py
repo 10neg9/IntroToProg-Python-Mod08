@@ -76,7 +76,7 @@ class Product:
 
         :return: (float) product price
         """
-        return self.__product_price  # return string title case product price
+        return self.__product_price  # return product price
 
     @product_price.setter
     def product_price(self, value: float):  # define setter of property product_price
@@ -153,6 +153,9 @@ class IO:
     methods:
         print_menu_Tasks():
         input_menu_choice(): -> (a string representing user's choice)
+        print_current_product_list(product_list: list):
+        input_product_and_price(): -> (a tuple with product name and price)
+        input_press_to_continue(optional_message=''):
 
     changelog: (When,Who,What)
         RRoot,1.1.2030,Created Class
